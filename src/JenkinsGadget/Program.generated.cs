@@ -27,6 +27,9 @@ namespace JenkinsGadget {
         /// <summary>The WiFi RS21 module using socket 6 of the mainboard.</summary>
         private Gadgeteer.Modules.GHIElectronics.WiFiRS21 wifiRS21;
         
+        /// <summary>The Extender module using socket 11 of the mainboard.</summary>
+        private Gadgeteer.Modules.GHIElectronics.Extender extender;
+        
         /// <summary>This property provides access to the Mainboard API. This is normally not necessary for an end user program.</summary>
         protected new static GHIElectronics.Gadgeteer.FEZSpider Mainboard {
             get {
@@ -53,6 +56,7 @@ namespace JenkinsGadget {
             this.multicolorLED = new GTM.GHIElectronics.MulticolorLED(4);
             this.usbClientDP = new GTM.GHIElectronics.USBClientDP(1);
             this.wifiRS21 = new GTM.GHIElectronics.WiFiRS21(6);
+            this.extender = new GTM.GHIElectronics.Extender(11);
         }
     }
 }

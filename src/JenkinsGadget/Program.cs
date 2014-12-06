@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Net;
 using System.Threading;
+using Gadgeteer.SocketInterfaces;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Presentation;
 using Microsoft.SPOT.Presentation.Controls;
@@ -30,41 +31,54 @@ namespace JenkinsGadget
 
     public partial class Program
     {
+        string jenkinsUrl = "myjenkinsurl";
+        private string ssid = "mynetworkssid";
+        private string networkKey = "myhousekey";
+        private string jenkinsUserName = "myusername";
+        private string jenkinsPassword = "mypassword";
+
         private JenkinsState currentState = JenkinsState.Red;
         private WiFiHelper helper;
         private bool networkingOk = false;
-        GT.Timer timer = new GT.Timer(15000);
-        string jenkinsUrl = "";
-        private string ssid = "";
-        private string networkKey = "";
-        private string jenkinsUserName = "";
-        private string jenkinsPassword = "";
-
+        GT.Timer timer = new GT.Timer(10000);
+        private DigitalOutput green;
+        private DigitalOutput red;
+        private DigitalOutput yellow;
+        bool blink = false;
+        DigitalOutput currentColor;
+        GT.Timer lightControl = new GT.Timer(2000);
    
         // This method is run when the mainboard is powered up or reset.   
         void ProgramStarted()
         {
-            /*******************************************************************************************
-            Modules added in the Program.gadgeteer designer view are used by typing 
-            their name followed by a period, e.g.  button.  or  camera.
-            
-            Many modules generate useful events. Type +=<tab><tab> to add a handler to an event, e.g.:
-                button.ButtonPressed +=<tab><tab>
-            
-            If you want to do something periodically, use a GT.Timer and handle its Tick event, e.g.:
-                GT.Timer timer = new GT.Timer(1000); // every second (1000ms)
-                timer.Tick +=<tab><tab>
-                timer.Start();
-            *******************************************************************************************/
-
-
-            // Use Debug.Print to show messages in Visual Studio's "Output" window during debugging.
             Debug.Print("Program Started");
+            green = extender.CreateDigitalOutput(GT.Socket.Pin.Nine, false);
+            red = extender.CreateDigitalOutput(GT.Socket.Pin.Eight, false);
+            yellow = extender.CreateDigitalOutput(GT.Socket.Pin.Seven, false);
+            currentColor = green;
             helper = new WiFiHelper(this.wifiRS21);
             this.button.ButtonPressed += button_ButtonPressed;
             wifiRS21.NetworkUp += wifiModule_NetworkUp;
             timer.Tick += timer_Tick;
+            lightControl.Tick += lightControl_Tick;
+        }
 
+        void lightControl_Tick(GT.Timer timer)
+        {
+            green.Write(false);
+            red.Write(false);
+            yellow.Write(false);
+
+            if (blink)
+            {
+                currentColor.Write(true);
+                Thread.Sleep(1000);
+                currentColor.Write(false);
+            }
+            else
+            {
+                currentColor.Write(true);
+            }
         }
 
         void timer_Tick(GT.Timer timer)
@@ -82,13 +96,38 @@ namespace JenkinsGadget
                 this.multicolorLED.BlinkOnce(GT.Color.White);
                 networkingOk = true;
                 timer.Start();
+                lightControl.Start();
             }
         }
 
         private void button_ButtonPressed(Button sender, Button.ButtonState state)
         {
+            GT.Timer scanning = new GT.Timer(1000);
+            scanning.Tick += scanning_Tick;
+            scanning.Start();
+
             var started = helper.Start(ssid, networkKey);
             Debug.Print("Wifi Started : " + started);
+            scanning.Stop();
+            green.Write(false);
+            red.Write(false);
+            yellow.Write(false);
+        }
+
+        void scanning_Tick(GT.Timer timer)
+        {
+            green.Write(true);
+            Thread.Sleep(100);
+            red.Write(true);
+            Thread.Sleep(100);
+            yellow.Write(true);
+            Thread.Sleep(100);
+            green.Write(false);
+            Thread.Sleep(100);
+            red.Write(false);
+            Thread.Sleep(100);
+            yellow.Write(false);
+            Thread.Sleep(100);
         }
 
         private void WatchJenkins()
@@ -118,31 +157,40 @@ namespace JenkinsGadget
 
             JenkinsState state = GetCurrentState(content);
 
-            if (currentState == state)
-                return;
-
             if (state == JenkinsState.Blue)
             {
+                currentColor = green;
+                blink = false;
                 this.multicolorLED.TurnBlue();
             }
             if (state == JenkinsState.Blue_Building)
             {
+                currentColor = green;
+                blink = true;
                 this.multicolorLED.BlinkRepeatedly(GT.Color.Blue);
             }
             if (state == JenkinsState.Red)
             {
+                currentColor = red;
+                blink = false;
                 this.multicolorLED.TurnRed();
             }
             if (state == JenkinsState.Red_Building)
             {
+                currentColor = red;
+                blink = true;
                 this.multicolorLED.BlinkRepeatedly(GT.Color.Red);
             }
             if (state == JenkinsState.Yellow)
             {
+                currentColor = yellow;
+                blink = false;
                 this.multicolorLED.TurnColor(GT.Color.Yellow);
             }
             if (state == JenkinsState.Yellow_Building)
             {
+                currentColor = yellow;
+                blink = true;
                 this.multicolorLED.BlinkRepeatedly(GT.Color.Yellow);
             }
             currentState = state;
