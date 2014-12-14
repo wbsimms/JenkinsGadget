@@ -15,25 +15,25 @@ namespace JenkinsGadget {
     
     public partial class Program : Gadgeteer.Program {
         
-        /// <summary>The Button module using socket 8 of the mainboard.</summary>
+        /// <summary>The Button module using socket 1 of the mainboard.</summary>
         private Gadgeteer.Modules.GHIElectronics.Button button;
         
-        /// <summary>The Multicolor LED module using socket 4 of the mainboard.</summary>
-        private Gadgeteer.Modules.GHIElectronics.MulticolorLED multicolorLED;
-        
-        /// <summary>The USB Client DP module using socket 1 of the mainboard.</summary>
+        /// <summary>The USB Client DP module using socket 8 of the mainboard.</summary>
         private Gadgeteer.Modules.GHIElectronics.USBClientDP usbClientDP;
         
-        /// <summary>The WiFi RS21 module using socket 6 of the mainboard.</summary>
+        /// <summary>The BreadBoard X1 module using socket 18 of the mainboard.</summary>
+        private Gadgeteer.Modules.GHIElectronics.BreadBoardX1 breadBoardX1;
+        
+        /// <summary>The WiFi RS21 module using socket 3 of the mainboard.</summary>
         private Gadgeteer.Modules.GHIElectronics.WiFiRS21 wifiRS21;
         
-        /// <summary>The Extender module using socket 11 of the mainboard.</summary>
-        private Gadgeteer.Modules.GHIElectronics.Extender extender;
+        /// <summary>The Multicolor LED module using socket 2 of the mainboard.</summary>
+        private Gadgeteer.Modules.GHIElectronics.MulticolorLED multicolorLED;
         
         /// <summary>This property provides access to the Mainboard API. This is normally not necessary for an end user program.</summary>
-        protected new static GHIElectronics.Gadgeteer.FEZSpider Mainboard {
+        protected new static GHIElectronics.Gadgeteer.FEZRaptor Mainboard {
             get {
-                return ((GHIElectronics.Gadgeteer.FEZSpider)(Gadgeteer.Program.Mainboard));
+                return ((GHIElectronics.Gadgeteer.FEZRaptor)(Gadgeteer.Program.Mainboard));
             }
             set {
                 Gadgeteer.Program.Mainboard = value;
@@ -43,7 +43,7 @@ namespace JenkinsGadget {
         /// <summary>This method runs automatically when the device is powered, and calls ProgramStarted.</summary>
         public static void Main() {
             // Important to initialize the Mainboard first
-            Program.Mainboard = new GHIElectronics.Gadgeteer.FEZSpider();
+            Program.Mainboard = new GHIElectronics.Gadgeteer.FEZRaptor();
             Program p = new Program();
             p.InitializeModules();
             p.ProgramStarted();
@@ -52,11 +52,11 @@ namespace JenkinsGadget {
         }
         
         private void InitializeModules() {
-            this.button = new GTM.GHIElectronics.Button(8);
-            this.multicolorLED = new GTM.GHIElectronics.MulticolorLED(4);
-            this.usbClientDP = new GTM.GHIElectronics.USBClientDP(1);
-            this.wifiRS21 = new GTM.GHIElectronics.WiFiRS21(6);
-            this.extender = new GTM.GHIElectronics.Extender(11);
+            this.button = new GTM.GHIElectronics.Button(1);
+            this.usbClientDP = new GTM.GHIElectronics.USBClientDP(8);
+            this.breadBoardX1 = new GTM.GHIElectronics.BreadBoardX1(18);
+            this.wifiRS21 = new GTM.GHIElectronics.WiFiRS21(3);
+            this.multicolorLED = new GTM.GHIElectronics.MulticolorLED(2);
         }
     }
 }

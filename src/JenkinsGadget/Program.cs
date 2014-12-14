@@ -37,6 +37,7 @@ namespace JenkinsGadget
         private string jenkinsUserName = "myusername";
         private string jenkinsPassword = "mypassword";
 
+
         private JenkinsState currentState = JenkinsState.Red;
         private WiFiHelper helper;
         private bool networkingOk = false;
@@ -52,9 +53,9 @@ namespace JenkinsGadget
         void ProgramStarted()
         {
             Debug.Print("Program Started");
-            green = extender.CreateDigitalOutput(GT.Socket.Pin.Nine, false);
-            red = extender.CreateDigitalOutput(GT.Socket.Pin.Eight, false);
-            yellow = extender.CreateDigitalOutput(GT.Socket.Pin.Seven, false);
+            green = breadBoardX1.CreateDigitalOutput(GT.Socket.Pin.Three, false);
+            red = breadBoardX1.CreateDigitalOutput(GT.Socket.Pin.Five, false);
+            yellow = breadBoardX1.CreateDigitalOutput(GT.Socket.Pin.Seven, false);
             currentColor = green;
             helper = new WiFiHelper(this.wifiRS21);
             this.button.ButtonPressed += button_ButtonPressed;
@@ -222,6 +223,15 @@ namespace JenkinsGadget
             {
                 return JenkinsState.Yellow_Building;
             }
+            if (content.IndexOf(">aborted<", 1) != -1)
+            {
+                return JenkinsState.Yellow;
+            }
+            if (content.IndexOf(">aborted_anime<", 1) != -1)
+            {
+                return JenkinsState.Yellow_Building;
+            }
+
             return JenkinsState.Red;
         }
     }
