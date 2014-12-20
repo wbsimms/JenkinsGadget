@@ -31,11 +31,12 @@ namespace JenkinsGadget
 
     public partial class Program
     {
-        string jenkinsUrl = "myjenkinsurl";
-        private string ssid = "mynetworkssid";
-        private string networkKey = "myhousekey";
-        private string jenkinsUserName = "myusername";
-        private string jenkinsPassword = "mypassword";
+        string jenkinsUrl = "http://iq-build.cloudapp.net:8080/api/xml/";
+        private string ssid = "18Megansett";
+        private string networkKey = "dbcb436deb";
+        private string jenkinsUserName = "bsimms";
+        private string jenkinsPassword = "Comp533!";
+
 
 
         private JenkinsState currentState = JenkinsState.Red;
@@ -66,9 +67,9 @@ namespace JenkinsGadget
 
         void lightControl_Tick(GT.Timer timer)
         {
-            green.Write(false);
-            red.Write(false);
-            yellow.Write(false);
+            if (currentColor != green) green.Write(false);
+            if (currentColor != red) red.Write(false);
+            if (currentColor != yellow) yellow.Write(false);
 
             if (blink)
             {
@@ -157,6 +158,7 @@ namespace JenkinsGadget
             if (content == null || content == "") return;
 
             JenkinsState state = GetCurrentState(content);
+            if (state == currentState) return;
 
             if (state == JenkinsState.Blue)
             {
