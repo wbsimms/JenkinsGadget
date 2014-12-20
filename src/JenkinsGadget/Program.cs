@@ -37,7 +37,6 @@ namespace JenkinsGadget
         private string jenkinsUserName = "myusername";
         private string jenkinsPassword = "mypassword";
 
-
         private JenkinsState currentState = JenkinsState.Red;
         private WiFiHelper helper;
         private bool networkingOk = false;
@@ -66,9 +65,9 @@ namespace JenkinsGadget
 
         void lightControl_Tick(GT.Timer timer)
         {
-            green.Write(false);
-            red.Write(false);
-            yellow.Write(false);
+            if (currentColor != green) green.Write(false);
+            if (currentColor != red) red.Write(false);
+            if (currentColor != yellow) yellow.Write(false);
 
             if (blink)
             {
@@ -157,6 +156,7 @@ namespace JenkinsGadget
             if (content == null || content == "") return;
 
             JenkinsState state = GetCurrentState(content);
+            if (state == currentState) return;
 
             if (state == JenkinsState.Blue)
             {
